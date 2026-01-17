@@ -4,6 +4,8 @@ struct CarouselView: View {
     let rail: Rail
     @Binding var currentIndex: Int
 
+    private let cardSpacing: CGFloat = 16
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Section Title
@@ -12,34 +14,20 @@ struct CarouselView: View {
                 .foregroundColor(AppColors.primaryText)
                 .padding(.horizontal, LayoutConstants.horizontalPadding)
 
-            // Horizontal Carousel
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 16) {
-                    ForEach(Array(rail.items.enumerated()), id: \.element.id) { index, item in
-                        CarouselCardView(
-                            item: item,
-                            isActive: index == currentIndex
-                        )
-                        .onTapGesture {
-                            withAnimation(AnimationConstants.fadeAnimation) {
-                                currentIndex = index
-                            }
-                        }
-                    }
+            // Horizontal Carousel using TabView for reliable paging
+            TabView(selection: $currentIndex) {
+                ForEach(Array(rail.items.enumerated()), id: \.element.id) { index, item in
+                    CarouselCardView(
+                        item: item,
+                        isActive: index == currentIndex
+                    )
+                    .padding(.horizontal, 24)
+                    .tag(index)
                 }
-                .padding(.horizontal, LayoutConstants.horizontalPadding)
-                .scrollTargetLayout()
             }
-            .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: Binding(
-                get: { rail.items.indices.contains(currentIndex) ? rail.items[currentIndex].id : nil },
-                set: { newId in
-                    if let newId, let index = rail.items.firstIndex(where: { $0.id == newId }) {
-                        currentIndex = index
-                    }
-                }
-            ))
-            .frame(height: LayoutConstants.cardHeight)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: LayoutConstants.cardHeight + 20)
+            .animation(AnimationConstants.fadeAnimation, value: currentIndex)
 
             // Page Indicator
             HStack(spacing: 8) {
@@ -47,6 +35,7 @@ struct CarouselView: View {
                     Circle()
                         .fill(index == currentIndex ? AppColors.accentColor : Color.gray.opacity(0.3))
                         .frame(width: 8, height: 8)
+                        .scaleEffect(index == currentIndex ? 1.2 : 1.0)
                         .animation(AnimationConstants.fadeAnimation, value: currentIndex)
                 }
             }

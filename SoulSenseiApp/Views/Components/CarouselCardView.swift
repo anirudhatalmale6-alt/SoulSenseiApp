@@ -27,12 +27,13 @@ struct CarouselCardView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
         }
-        .frame(width: LayoutConstants.cardWidth)
+        .frame(maxWidth: .infinity)
+        .frame(height: LayoutConstants.cardHeight)
         .background(AppColors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.cardCornerRadius))
         .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-        .opacity(isActive ? 1.0 : 0.6)
-        .scaleEffect(isActive ? 1.0 : 0.95)
+        .opacity(isActive ? 1.0 : 0.7)
+        .scaleEffect(isActive ? 1.0 : 0.92)
         .animation(AnimationConstants.fadeAnimation, value: isActive)
     }
 }
